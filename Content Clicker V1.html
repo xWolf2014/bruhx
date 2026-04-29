@@ -1,0 +1,3479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Clicker - Ultimate Clicking Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .title {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .title p {
+            color: #888;
+            font-size: 1.1em;
+        }
+
+        /* LEFT COLUMN - Main Clicker */
+        .clicker-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .clicks-per-second {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .click-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .click-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 45px rgba(102, 126, 234, 0.6);
+        }
+
+        .click-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .popup {
+            position: fixed;
+            pointer-events: none;
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #667eea;
+            animation: popupAnimation 1s ease-out forwards;
+        }
+
+        @keyframes popupAnimation {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.2);
+            }
+        }
+
+        /* RIGHT COLUMN - Upgrades */
+        .upgrades-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .upgrades-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 400px;
+            padding-right: 10px;
+        }
+
+        .upgrades-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .upgrades-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .upgrades-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .upgrade-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .upgrade-item:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .upgrade-item.purchased {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+
+        .upgrade-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upgrade-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .upgrade-info p {
+            color: #888;
+            font-size: 0.9em;
+            margin: 3px 0;
+        }
+
+        .upgrade-cost {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            white-space: nowrap;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .upgrade-item.purchased .upgrade-cost {
+            background: #4caf50;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            grid-column: 1 / -1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .reset-button {
+            grid-column: 1 / -1;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .reset-button:hover {
+            background: #ff5252;
+            transform: scale(1.02);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #667eea;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .comments-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .moderation-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .quick-mod-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quick-mod-btn:hover {
+            background: #f57c00;
+            transform: scale(1.05);
+        }
+
+        .comment-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .comment-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #commentInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Arial', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        #commentInput:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        #submitCommentBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        #submitCommentBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        #submitCommentBtn:active {
+            transform: scale(0.95);
+        }
+
+        .comments-display {
+            flex: 1;
+            min-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 10px;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .comments-display::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .comments-display::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .comments-display::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 12px 15px;
+            border-radius: 6px;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .comment-text {
+            color: #333;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        .comment-time {
+            color: #999;
+            font-size: 0.8em;
+        }
+
+        .no-comments {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Username Section */
+        .username-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .username-label {
+            font-weight: bold;
+            color: #667eea;
+            white-space: nowrap;
+        }
+
+        #displayedName {
+            background: #f0f4ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid #000000;
+            color: #333;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .owner-badge {
+            background: #000;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid #fff;
+        }
+
+        .name-tag {
+            font-size: 0.8em;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .owner-privileges {
+            background: #f4f7ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .owner-privileges-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .owner-privileges-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .owner-action-btn {
+            background: #ffb74d;
+            color: #2e2e2e;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .owner-action-btn:hover {
+            background: #ffa726;
+            transform: translateY(-1px);
+        }
+
+        #editNameBtn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        #editNameBtn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        #editTagBtn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        #editTagBtn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        /* Color Picker Modal */
+        .color-picker-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .color-picker-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .color-picker-content h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .color-input-group {
+            margin-bottom: 20px;
+        }
+
+        .color-input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .color-input-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .color-input-group input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .color-preview {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .color-picker-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .color-picker-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .color-save-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .color-save-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        .color-cancel-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .color-cancel-btn:hover {
+            background: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        .comment-author {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .comment-tag {
+            font-weight: bold;
+        }
+
+        .moderation-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .comment-item:hover .moderation-buttons {
+            opacity: 1;
+        }
+
+        .mod-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+        }
+
+        .kick-btn:hover {
+            background: #ff9800;
+            color: white;
+        }
+
+        /* Moderation Panel */
+        .moderation-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #667eea;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+        }
+
+        .moderation-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .moderation-toggle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .moderation-toggle:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .active-users-section {
+            margin-bottom: 20px;
+        }
+
+        .online-section {
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .online-summary {
+            margin-bottom: 15px;
+            color: #444;
+            font-weight: bold;
+        }
+
+        .active-users-title,
+        .online-section .section-title {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .active-users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .active-user-item {
+            background: #f0f8ff;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-user-name {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .user-kick-btn:hover {
+            background: #f57c00;
+            transform: scale(1.05);
+        }
+
+        .no-active-users {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Leaderboard Section */
+        .leaderboard-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #667eea;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .leaderboard-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .leaderboard-item {
+            background: linear-gradient(135deg, #f0f4ff 0%, #fff 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateX(-3px);
+        }
+
+        .leaderboard-item.first-place {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-color: #ffa500;
+        }
+
+        .leaderboard-item.second-place {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            border-color: #808080;
+        }
+
+        .leaderboard-item.third-place {
+            background: linear-gradient(135deg, #cd7f32 0%, #e8a76f 100%);
+            border-color: #8b4513;
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .leaderboard-item.first-place .leaderboard-rank {
+            color: #ffa500;
+        }
+
+        .leaderboard-item.second-place .leaderboard-rank {
+            color: #808080;
+        }
+
+        .leaderboard-item.third-place .leaderboard-rank {
+            color: #8b4513;
+        }
+
+        .leaderboard-player-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .leaderboard-player-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .leaderboard-player-stats {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .leaderboard-player-rebirths {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .leaderboard-score {
+            text-align: right;
+        }
+
+        .leaderboard-clicks {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .leaderboard-rebirths {
+            font-size: 0.9em;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .shop-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #667eea;
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .shop-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .no-shop-items {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .shop-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shop-item:hover {
+            border-color: #667eea;
+            transform: translateX(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.15);
+        }
+
+        .shop-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .shop-item.purchased {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+
+        .shop-item h3 {
+            margin-bottom: 5px;
+        }
+
+        .shop-item p {
+            margin: 0;
+            color: #666;
+        }
+
+        .shop-price {
+            font-weight: bold;
+            color: #333;
+            min-width: 180px;
+            text-align: right;
+        }
+
+        .shop-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shop-button:hover:not(:disabled) {
+            background: #5568d0;
+        }
+
+        .shop-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-leaderboard {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal.hidden {
+            display: none;
+        }
+
+        .login-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-content h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Arial', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .login-message.error {
+            background: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+
+        .login-message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        /* Rebirth Section */
+        .rebirth-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .rebirth-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .rebirth-description {
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            opacity: 0.95;
+        }
+
+        .rebirth-requirement {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .rebirth-requirement strong {
+            color: #ffd700;
+        }
+
+        .rebirth-button {
+            background: white;
+            color: #ff6b6b;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rebirth-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            background: #ffd700;
+            color: #ff6b6b;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .rebirth-button:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .rebirth-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
+            color: #999;
+        }
+
+        .rebirth-stats {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95em;
+            text-align: center;
+        }
+
+        .rebirth-stats-item {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .title h1 {
+                font-size: 2em;
+            }
+
+            .click-button {
+                width: 150px;
+                height: 150px;
+                font-size: 1.2em;
+            }
+
+            .score-value {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>🎮 Content Clicker V1</h1>
+            <p>Welcome to an entertaining clicker game!</p>
+        </div>
+
+        <div class="clicker-section">
+            <div class="score-display">
+                <div class="score-label">Total Score</div>
+                <div class="score-value" id="score">0</div>
+                <div class="clicks-per-second" id="cpsDisplay">Clicks per second: 0</div>
+            </div>
+            <button class="click-button" id="clickButton">CLICK ME!</button>
+        </div>
+
+        <div class="upgrades-section">
+            <div class="section-title">⬆️ Upgrades</div>
+            <div class="upgrades-list" id="upgradesList"></div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-label">Total Clicks</div>
+                <div class="stat-value" id="totalClicks">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Clicks Per Second</div>
+                <div class="stat-value" id="cps">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Active Upgrades</div>
+                <div class="stat-value" id="activeUpgrades">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total Spent</div>
+                <div class="stat-value" id="totalSpent">0</div>
+            </div>
+            <button class="reset-button" onclick="resetGame()">🔄 Reset Game</button>
+        </div>
+
+        <div class="rebirth-section" id="rebirthSection" style="display: none;">
+            <div class="rebirth-title">🔄 Rebirth Available!</div>
+            <div class="rebirth-description">You've reached the rebirth threshold! Start over and claim your place on the leaderboard.</div>
+            <div class="rebirth-requirement">
+                Rebirths: <strong id="playerRebirthCount">0</strong> | Next Rebirth Cost: <strong id="nextRebirthCost">1,000,000,000,000</strong>
+            </div>
+            <button class="rebirth-button" id="rebirthButton" onclick="performRebirth()">🚀 Rebirth Now</button>
+            <div class="rebirth-stats">
+                <div class="rebirth-stats-item">All progress will be reset to 0</div>
+                <div class="rebirth-stats-item">Your name will appear on the leaderboard</div>
+                <div class="rebirth-stats-item">Next rebirth will cost more clicks</div>
+            </div>
+        </div>
+
+        <div class="leaderboard-section" id="leaderboardSection">
+            <div class="leaderboard-title">🏆 Leaderboard (Top Players)</div>
+            <div class="leaderboard-list" id="leaderboardList">
+                <div class="no-leaderboard">No rebirths yet. Be the first!</div>
+            </div>
+        </div>
+
+        <div class="online-section">
+            <div class="section-title">🌐 Online Now</div>
+            <div class="online-summary">Active users: <strong id="onlineUsersCount">0</strong></div>
+            <div class="active-users-list" id="onlineUsersList">
+                <div class="no-active-users">No one is currently online.</div>
+            </div>
+        </div>
+
+        <div class="shop-section" id="shopSection">
+            <div class="section-title">🛒 Special Shop</div>
+            <div class="shop-list" id="shopList">
+                <div class="no-shop-items">Ultra-rare items start at 1.50e+100 clicks.</div>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <div class="comments-title">
+                <span>💬 Comments</span>
+                <div class="moderation-actions">
+                    <span class="comment-count" id="commentCount">0/1000000</span>
+                    <button class="moderation-toggle" onclick="toggleModerationPanel()" style="margin-left: 10px; display: none;">🛡️ Moderation</button>
+                </div>
+            </div>
+            <div class="username-section">
+                <span class="username-label">Your Name:</span>
+                <div id="displayedName">Default</div>
+                <span id="displayedTag" class="name-tag"></span>
+                <span class="owner-badge" style="display: none;">👑 OWNER</span>
+                <button id="editNameBtn" onclick="editName()">✏️ Edit</button>
+                <button id="editTagBtn" onclick="editTag()">🏷️ Edit Tag</button>
+                <button id="logoutBtn" onclick="logoutAccount()" style="background: #ff6b6b; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; font-weight: bold;">🚪 Logout</button>
+            </div>
+            <div class="owner-privileges" id="ownerPrivileges" style="display:none;">
+                <div class="owner-privileges-title">👑 Owner Privileges</div>
+                <div class="owner-privileges-actions">
+                    <button class="owner-action-btn" onclick="activateOwnerBoost()">🚀 Activate Owner Boost</button>
+                    <button class="owner-action-btn" onclick="giveOwnerGift()">💰 Owner Gift +1000</button>
+                    <button class="owner-action-btn" onclick="clearAllComments()">🧹 Clear All Comments</button>
+                    <button class="owner-action-btn" onclick="clearLeaderboard()">📋 Reset Leaderboard</button>
+                </div>
+            </div>
+            <div class="comment-input-group">
+                <input type="text" id="commentInput" placeholder="Share your thoughts..." maxlength="200">
+                <button id="submitCommentBtn" type="button">Post</button>
+            </div>
+            <div class="comments-display" id="commentsList">
+                <div class="no-comments">No comments yet. Be the first!</div>
+            </div>
+        </div>
+
+        <!-- Moderation Section (Owner Only) -->
+        <div class="moderation-section" id="moderationSection" style="display: none;">
+            <div class="moderation-title">
+                <span>🛡️ Owner Moderation</span>
+                <button class="moderation-toggle" onclick="toggleModerationPanel()">Show Panel</button>
+            </div>
+            <div class="active-users-section">
+                <div class="active-users-title">👥 Active Users</div>
+                <div class="active-users-list" id="activeUsersList">
+                    <div class="no-active-users">No active users yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-content">
+            <h2>🎮 Content Clicker</h2>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="login-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <input type="text" class="login-input" id="loginUsername" placeholder="Username" required>
+                <input type="password" class="login-input" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="login-btn">Login</button>
+                <div class="login-message" id="loginMessage"></div>
+            </form>
+
+            <!-- Register Form -->
+            <form class="login-form" id="registerForm" onsubmit="handleRegister(event)">
+                <input type="text" class="login-input" id="registerUsername" placeholder="Choose Username" required>
+                <input type="password" class="login-input" id="registerPassword" placeholder="Choose Password" required>
+                <input type="password" class="login-input" id="registerPasswordConfirm" placeholder="Confirm Password" required>
+                <button type="submit" class="login-btn">Create Account</button>
+                <div class="login-message" id="registerMessage"></div>
+            </form>
+
+            <p style="margin-top: 20px; color: #999; font-size: 0.9em;">Your account data is saved locally on this device</p>
+        </div>
+    </div>
+
+    <!-- Color Picker Modal -->
+    <div id="colorPickerModal" class="color-picker-modal" style="display: none;">
+        <div class="color-picker-content">
+            <h3>🎨 Customize Your Tag</h3>
+            <div class="color-input-group">
+                <label for="tagTextInput">Tag Text:</label>
+                <input type="text" id="tagTextInput" placeholder="Enter your tag..." maxlength="20">
+            </div>
+            <div class="color-input-group">
+                <label for="tagColorInput">Tag Color:</label>
+                <input type="color" id="tagColorInput" value="#667eea">
+                <div id="colorPreview" class="color-preview">Preview</div>
+            </div>
+            <div class="color-picker-buttons">
+                <button class="color-save-btn" onclick="saveTagChanges()">Save</button>
+                <button class="color-cancel-btn" onclick="closeColorPicker()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quick load of username to prevent showing "Default"
+        const DEFAULT_USERNAME = 'Default';
+        const saved = localStorage.getItem('clickerGameState');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed.userName) {
+                    document.getElementById('displayedName').textContent = parsed.userName === 'notz' ? DEFAULT_USERNAME : parsed.userName;
+                }
+            } catch (e) {
+                // Ignore errors, will load properly in initGame
+            }
+        }
+
+        // Game State
+        let gameState = {
+            score: 0,
+            totalClicks: 0,
+            totalSpent: 0,
+            autoClicks: 0,
+            clickValue: 1,
+            upgrades: [],
+            comments: [],
+            userName: DEFAULT_USERNAME,
+            userTag: '',
+            tagColor: '#667eea',
+            isOriginalOwner: false,
+            ownerUserId: null,
+            ownerBoostActivated: false,
+            users: {}, // Store persistent user data
+            currentUserId: null, // Current user's unique ID
+            rebirthCount: 0, // Track player's total rebirths
+            totalClicksAllTime: 0, // Track total clicks across all rebirths
+            specialItemsPurchased: {} // Track shop item purchases
+        };
+
+        const COMMENT_LIMIT = 1000000;
+        const REBIRTH_THRESHOLD = 1e100; // 1.00e+100 clicks
+        const REBIRTH_MULTIPLIER = 1.5; // Each rebirth multiplies the cost by 1.5
+        const ONLINE_USERS_STORAGE_KEY = 'clickerOnlineUsers';
+        const ONLINE_TIMEOUT_MS = 30000; // Consider users online if active within the last 30 seconds
+        const ACCOUNTS_STORAGE_KEY = 'clickerAccounts';
+        const CURRENT_ACCOUNT_KEY = 'clickerCurrentAccount';
+
+        // ===== ACCOUNT MANAGEMENT =====
+        function getAllAccounts() {
+            const saved = localStorage.getItem(ACCOUNTS_STORAGE_KEY);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    return {};
+                }
+            }
+            return {};
+        }
+
+        function saveAccounts(accounts) {
+            localStorage.setItem(ACCOUNTS_STORAGE_KEY, JSON.stringify(accounts));
+        }
+
+        function getCurrentAccountName() {
+            return localStorage.getItem(CURRENT_ACCOUNT_KEY);
+        }
+
+        function setCurrentAccountName(accountName) {
+            localStorage.setItem(CURRENT_ACCOUNT_KEY, accountName);
+        }
+
+        function initializeOwnerAccount() {
+            const accounts = getAllAccounts();
+            // Create owner account if it doesn't exist
+            if (!accounts['notz']) {
+                accounts['notz'] = {
+                    password: 'notzischill',
+                    userName: 'notz',
+                    userTag: '👑 Owner',
+                    tagColor: '#FFD700',
+                    created: new Date().toISOString()
+                };
+                saveAccounts(accounts);
+                // Auto-login owner account
+                setCurrentAccountName('notz');
+            }
+        }
+
+        function createAccount(username, password) {
+            if (!username || !password) {
+                return { success: false, message: 'Username and password required' };
+            }
+            
+            if (username.length < 3) {
+                return { success: false, message: 'Username must be at least 3 characters' };
+            }
+            
+            if (password.length < 3) {
+                return { success: false, message: 'Password must be at least 3 characters' };
+            }
+
+            const accounts = getAllAccounts();
+            if (accounts[username]) {
+                return { success: false, message: 'Username already exists' };
+            }
+
+            accounts[username] = {
+                password: password, // In production, this should be hashed
+                userName: username,
+                userTag: '',
+                tagColor: '#667eea',
+                created: new Date().toISOString()
+            };
+
+            saveAccounts(accounts);
+            return { success: true, message: 'Account created successfully!' };
+        }
+
+        function loginAccount(username, password) {
+            const accounts = getAllAccounts();
+            const account = accounts[username];
+
+            if (!account) {
+                return { success: false, message: 'Username not found' };
+            }
+
+            if (account.password !== password) {
+                return { success: false, message: 'Incorrect password' };
+            }
+
+            setCurrentAccountName(username);
+            return { success: true, message: 'Login successful!' };
+        }
+
+        function switchTab(tabName) {
+            // Hide all forms
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('registerForm').classList.remove('active');
+
+            // Remove active from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected form and mark tab as active
+            if (tabName === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+
+            // Clear messages
+            document.getElementById('loginMessage').textContent = '';
+            document.getElementById('registerMessage').textContent = '';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageEl = document.getElementById('loginMessage');
+
+            const result = loginAccount(username, password);
+            if (result.success) {
+                messageEl.className = 'login-message success';
+                messageEl.textContent = '✓ ' + result.message;
+                setTimeout(() => {
+                    document.getElementById('loginModal').classList.add('hidden');
+                    gameState.currentUserId = getOrCreateUserIdentity();
+                    loadAccountData();
+                    updateDisplay();
+                    renderComments();
+                }, 500);
+            } else {
+                messageEl.className = 'login-message error';
+                messageEl.textContent = '✗ ' + result.message;
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            const messageEl = document.getElementById('registerMessage');
+
+            if (password !== passwordConfirm) {
+                messageEl.className = 'login-message error';
+                messageEl.textContent = '✗ Passwords do not match';
+                return;
+            }
+
+            const result = createAccount(username, password);
+            if (result.success) {
+                messageEl.className = 'login-message success';
+                messageEl.textContent = '✓ ' + result.message;
+                document.getElementById('registerForm').reset();
+                setTimeout(() => {
+                    switchTab('login');
+                }, 500);
+            } else {
+                messageEl.className = 'login-message error';
+                messageEl.textContent = '✗ ' + result.message;
+            }
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function loadAccountData() {
+            const accountName = getCurrentAccountName();
+            if (!accountName) return;
+
+            const accounts = getAllAccounts();
+            const account = accounts[accountName];
+            if (!account) return;
+
+            gameState.userName = account.userName;
+            gameState.userTag = account.userTag || '';
+            gameState.tagColor = account.tagColor || '#667eea';
+
+            // Ensure user data is saved to the users object
+            if (gameState.currentUserId) {
+                gameState.users[gameState.currentUserId] = {
+                    name: gameState.userName,
+                    tag: gameState.userTag,
+                    tagColor: gameState.tagColor,
+                    isOriginalOwner: false
+                };
+            }
+
+            document.getElementById('displayedName').textContent = gameState.userName;
+            updateTagDisplay();
+            saveGame();
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function logoutAccount() {
+            if (confirm('Are you sure you want to logout?')) {
+                setCurrentAccountName('');
+                // Reset to default user identity but keep game progress
+                gameState.userName = DEFAULT_USERNAME;
+                gameState.userTag = '';
+                gameState.tagColor = '#667eea';
+                gameState.currentUserId = generateUserId();
+                localStorage.setItem('clickerUserId', gameState.currentUserId);
+                saveGame();
+                showLoginModal();
+            }
+        }
+
+        // Get leaderboard data from localStorage
+        function getLeaderboard() {
+            const saved = localStorage.getItem('clickerLeaderboard');
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    return [];
+                }
+            }
+            return [];
+        }
+
+        // Save leaderboard data to localStorage
+        function saveLeaderboard(leaderboard) {
+            localStorage.setItem('clickerLeaderboard', JSON.stringify(leaderboard));
+        }
+
+        // Update or create current user entry in leaderboard
+        function updateUserLeaderboardEntry() {
+            const leaderboard = getLeaderboard();
+            const userId = gameState.currentUserId;
+            const existingIndex = leaderboard.findIndex(p => p.userId === userId);
+            const totalClicks = gameState.totalClicksAllTime + gameState.score;
+            const rebirthCount = gameState.rebirthCount;
+            const score = gameState.score;
+
+            if (existingIndex !== -1) {
+                leaderboard[existingIndex].name = gameState.userName;
+                leaderboard[existingIndex].score = score;
+                leaderboard[existingIndex].totalClicks = totalClicks;
+                leaderboard[existingIndex].rebirthCount = rebirthCount;
+                leaderboard[existingIndex].lastSeen = new Date().toISOString();
+            } else {
+                leaderboard.push({
+                    userId: userId,
+                    name: gameState.userName,
+                    score: score,
+                    totalClicks: totalClicks,
+                    rebirthCount: rebirthCount,
+                    lastSeen: new Date().toISOString()
+                });
+            }
+            saveLeaderboard(leaderboard);
+        }
+
+        // Calculate rebirth cost based on number of rebirths
+        function calculateRebirthCost(rebirthCount) {
+            return Math.floor(REBIRTH_THRESHOLD * Math.pow(REBIRTH_MULTIPLIER, rebirthCount));
+        }
+
+        // Add player to leaderboard
+        function addToLeaderboard(playerName, rebirthCount, totalClicks) {
+            let leaderboard = getLeaderboard();
+            
+            const userId = gameState.currentUserId;
+            const existingIndex = leaderboard.findIndex(p => p.userId === userId);
+            
+            if (existingIndex !== -1) {
+                leaderboard[existingIndex].name = playerName;
+                leaderboard[existingIndex].rebirthCount = rebirthCount;
+                leaderboard[existingIndex].score = 0;
+                leaderboard[existingIndex].totalClicks = totalClicks;
+                leaderboard[existingIndex].lastRebirthTime = new Date().toISOString();
+            } else {
+                leaderboard.push({
+                    userId: userId,
+                    name: playerName,
+                    rebirthCount: rebirthCount,
+                    score: 0,
+                    totalClicks: totalClicks,
+                    firstRebirthTime: new Date().toISOString(),
+                    lastRebirthTime: new Date().toISOString()
+                });
+            }
+            
+            // Sort by rebirths (descending), then by total clicks (descending)
+            leaderboard.sort((a, b) => {
+                if (b.rebirthCount !== a.rebirthCount) {
+                    return b.rebirthCount - a.rebirthCount;
+                }
+                return (b.totalClicks || 0) - (a.totalClicks || 0);
+            });
+            
+            saveLeaderboard(leaderboard);
+        }
+
+        // Render leaderboard
+        function renderLeaderboard() {
+            const leaderboard = getLeaderboard();
+            const leaderboardList = document.getElementById('leaderboardList');
+            
+            if (!leaderboardList) return;
+            
+            if (leaderboard.length === 0) {
+                leaderboardList.innerHTML = '<div class="no-leaderboard">No rebirths yet. Be the first!</div>';
+                return;
+            }
+            
+            const leaderboardHTML = leaderboard.map((player, index) => {
+                let placeClass = '';
+                let medal = '•';
+                if (index === 0) {
+                    placeClass = 'first-place';
+                    medal = '🥇';
+                } else if (index === 1) {
+                    placeClass = 'second-place';
+                    medal = '🥈';
+                } else if (index === 2) {
+                    placeClass = 'third-place';
+                    medal = '🥉';
+                }
+                
+                const displayClicks = player.totalClicks != null ? player.totalClicks : player.score || 0;
+                return `
+                    <div class="leaderboard-item ${placeClass}">
+                        <div class="leaderboard-rank">${medal}</div>
+                        <div class="leaderboard-player-info">
+                            <div class="leaderboard-player-name">${sanitizeHTML(player.name)}</div>
+                            <div class="leaderboard-player-stats">
+                                📊 ${formatNumber(displayClicks)} clicks | 🔄 ${player.rebirthCount} rebirths
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            leaderboardList.innerHTML = leaderboardHTML;
+        }
+
+        // Perform Rebirth
+        function performRebirth() {
+            const rebirthCost = calculateRebirthCost(gameState.rebirthCount);
+            
+            if (gameState.score < rebirthCost) {
+                alert('You do not have enough clicks to rebirth yet!');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to rebirth? Your progress will reset, but you'll be added to the leaderboard!\n\nCost: ${formatNumber(rebirthCost)} clicks`)) {
+                return;
+            }
+            
+            // Update total clicks before rebirth (add current score to all-time total)
+            gameState.totalClicksAllTime += gameState.score;
+            
+            // Increment rebirth count first, then add to leaderboard
+            gameState.rebirthCount += 1;
+            
+            // Add to leaderboard with updated rebirth count and total clicks
+            addToLeaderboard(gameState.userName, gameState.rebirthCount, gameState.totalClicksAllTime);
+            
+            // Reset game progress
+            gameState.score = 0;
+            gameState.totalClicks = 0;
+            gameState.totalSpent = 0;
+            gameState.autoClicks = 0;
+            gameState.clickValue = 1;
+            gameState.upgrades = [];
+            gameState.ownerBoostActivated = false;
+            
+            // Reapply purchased shop effects so special items still work after rebirth
+            applyPurchasedSpecialShopEffects();
+            
+            saveGame();
+            updateDisplay();
+            renderUpgrades();
+            renderLeaderboard();
+            checkRebirthAvailability();
+            
+            alert(`🎉 Congratulations on your rebirth! You are now at rebirth level ${gameState.rebirthCount}!\n\nNext rebirth will require: ${formatNumber(calculateRebirthCost(gameState.rebirthCount))} clicks`);
+        }
+
+        // Check if rebirth is available and show/hide the section
+        function checkRebirthAvailability() {
+            const rebirthSection = document.getElementById('rebirthSection');
+            const rebirthButton = document.getElementById('rebirthButton');
+            
+            if (!rebirthSection) return;
+            
+            const currentRebirthCost = calculateRebirthCost(gameState.rebirthCount);
+            
+            // Show rebirth section if score >= threshold
+            if (gameState.score >= REBIRTH_THRESHOLD) {
+                rebirthSection.style.display = 'block';
+            } else {
+                rebirthSection.style.display = 'none';
+            }
+            
+            // Update rebirth UI
+            const playerRebirthCount = document.getElementById('playerRebirthCount');
+            const nextRebirthCost = document.getElementById('nextRebirthCost');
+            const nextCost = calculateRebirthCost(gameState.rebirthCount);
+            
+            if (playerRebirthCount) playerRebirthCount.textContent = gameState.rebirthCount;
+            if (nextRebirthCost) nextRebirthCost.textContent = formatNumber(nextCost);
+            
+            // Enable/disable rebirth button
+            if (rebirthButton) {
+                if (gameState.score >= currentRebirthCost) {
+                    rebirthButton.disabled = false;
+                } else {
+                    rebirthButton.disabled = true;
+                }
+            }
+        }
+        
+        // Generate unique user ID
+        function generateUserId() {
+            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Get or create user identity
+        function getOrCreateUserIdentity() {
+            let userId = localStorage.getItem('clickerUserId');
+            if (!userId) {
+                userId = generateUserId();
+                localStorage.setItem('clickerUserId', userId);
+            }
+            return userId;
+        }
+
+        // Load user data
+        function loadUserData(userId) {
+            if (gameState.users[userId]) {
+                const userData = gameState.users[userId];
+                gameState.userName = userData.name;
+                gameState.userTag = userData.tag || '';
+                gameState.tagColor = userData.tagColor || '#667eea';
+                gameState.isOriginalOwner = userData.isOriginalOwner || false;
+            }
+        }
+
+        // Save user data
+        function saveUserData(userId) {
+            gameState.users[userId] = {
+                name: gameState.userName,
+                tag: gameState.userTag,
+                tagColor: gameState.tagColor,
+                isOriginalOwner: gameState.isOriginalOwner,
+                lastSeen: new Date().toISOString()
+            };
+        }
+
+        // Upgrade Definitions
+        const upgradeDefinitions = [
+            {
+                id: 1,
+                name: "Double Click",
+                description: "Double your click value",
+                baseCost: 10,
+                effect: () => { gameState.clickValue *= 2; }
+            },
+            {
+                id: 2,
+                name: "Auto Clicker",
+                description: "+1 clicks per second",
+                baseCost: 50,
+                effect: () => { gameState.autoClicks += 1; }
+            },
+            {
+                id: 3,
+                name: "Mega Multiplier",
+                description: "x3 click value",
+                baseCost: 100,
+                effect: () => { gameState.clickValue *= 3; }
+            },
+            {
+                id: 4,
+                name: "Super Auto",
+                description: "+5 clicks per second",
+                baseCost: 200,
+                effect: () => { gameState.autoClicks += 5; }
+            },
+            {
+                id: 5,
+                name: "Power Surge",
+                description: "x5 click value",
+                baseCost: 500,
+                effect: () => { gameState.clickValue *= 5; }
+            },
+            {
+                id: 6,
+                name: "Ultimate Bot",
+                description: "+10 clicks per second",
+                baseCost: 1000,
+                effect: () => { gameState.autoClicks += 10; }
+            },
+            {
+                id: 7,
+                name: "Infinity Stone",
+                description: "x10 click value",
+                baseCost: 5000,
+                effect: () => { gameState.clickValue *= 10; }
+            },
+            {
+                id: 8,
+                name: "Quantum Computer",
+                description: "+100 clicks per second",
+                baseCost: 10000,
+                effect: () => { gameState.autoClicks += 100; }
+            },
+            {
+                id: 9,
+                name: "Cosmic Amplifier",
+                description: "x25 click value",
+                baseCost: 25000,
+                effect: () => { gameState.clickValue *= 25; }
+            },
+            {
+                id: 10,
+                name: "Neural Network",
+                description: "+500 clicks per second",
+                baseCost: 50000,
+                effect: () => { gameState.autoClicks += 500; }
+            },
+            {
+                id: 11,
+                name: "Dimensional Rift",
+                description: "x50 click value",
+                baseCost: 100000,
+                effect: () => { gameState.clickValue *= 50; }
+            },
+            {
+                id: 12,
+                name: "AI Overlord",
+                description: "+1000 clicks per second",
+                baseCost: 500000,
+                effect: () => { gameState.autoClicks += 1000; }
+            },
+            {
+                id: 13,
+                name: "Reality Engine",
+                description: "x100 click value",
+                baseCost: 1000000,
+                effect: () => { gameState.clickValue *= 100; }
+            },
+            {
+                id: 14,
+                name: "Quantum Fabricator",
+                description: "+5000 clicks per second",
+                baseCost: 5000000,
+                effect: () => { gameState.autoClicks += 5000; }
+            },
+            {
+                id: 15,
+                name: "Multiverse Core",
+                description: "x500 click value",
+                baseCost: 25000000,
+                effect: () => { gameState.clickValue *= 500; }
+            },
+            {
+                id: 16,
+                name: "Singularity Generator",
+                description: "+25000 clicks per second",
+                baseCost: 100000000,
+                effect: () => { gameState.autoClicks += 25000; }
+            },
+            {
+                id: 17,
+                name: "Omni-Matrix",
+                description: "x1000 click value",
+                baseCost: 500000000,
+                effect: () => { gameState.clickValue *= 1000; }
+            },
+            {
+                id: 18,
+                name: "Chronal Accelerator",
+                description: "+100000 clicks per second",
+                baseCost: 2500000000,
+                effect: () => { gameState.autoClicks += 100000; }
+            },
+            {
+                id: 19,
+                name: "Eternal Nexus",
+                description: "x5000 click value",
+                baseCost: 10000000000,
+                effect: () => { gameState.clickValue *= 5000; }
+            },
+            {
+                id: 20,
+                name: "God Machine",
+                description: "+500000 clicks per second",
+                baseCost: 50000000000,
+                effect: () => { gameState.autoClicks += 500000; }
+            }
+        ];
+
+        const specialShopItems = [
+            {
+                id: 'galactic-cursor',
+                name: 'Galactic Cursor',
+                description: 'A cursor forged from cosmic energy that multiplies your click power.',
+                cost: 1.5e100,
+                persistentEffect: () => { gameState.clickValue *= 1000; }
+            },
+            {
+                id: 'quantum-processor',
+                name: 'Quantum Processor',
+                description: 'A processor that boosts your auto-clickers with a huge flat bonus.',
+                cost: 1.5e101,
+                persistentEffect: () => { gameState.autoClicks += 500; }
+            },
+            {
+                id: 'eternal-relic',
+                name: 'Eternal Relic',
+                description: 'An artifact that massively boosts your entire progress and provides rebirth bonuses.',
+                cost: 1.5e102,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100;
+                    gameState.autoClicks += 50;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 5; // Bonus rebirths
+                }
+            },
+            {
+                id: 'infinity-core',
+                name: 'Infinity Core',
+                description: 'Harness infinite energy to multiply all your stats.',
+                cost: 1.5e103,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000;
+                    gameState.autoClicks += 1000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e50; // Bonus clicks
+                }
+            },
+            {
+                id: 'time-manipulator',
+                name: 'Time Manipulator',
+                description: 'Bend time to accelerate your clicking speed and auto-generation.',
+                cost: 1.5e104,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000;
+                    gameState.autoClicks += 5000;
+                }
+            },
+            {
+                id: 'dimensional-anchor',
+                name: 'Dimensional Anchor',
+                description: 'Stabilize multiple dimensions to exponentially boost your power.',
+                cost: 2e105,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000;
+                    gameState.autoClicks += 10000;
+                }
+            },
+            {
+                id: 'reality-weaver',
+                name: 'Reality Weaver',
+                description: 'Rewrite reality itself to create infinite clicking potential.',
+                cost: 5e106,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000;
+                    gameState.autoClicks += 50000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e60;
+                }
+            },
+            {
+                id: 'cosmic-harvester',
+                name: 'Cosmic Harvester',
+                description: 'Harvest energy from the entire cosmos for unlimited power.',
+                cost: 1e108,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000;
+                    gameState.autoClicks += 100000;
+                }
+            },
+            {
+                id: 'eternity-engine',
+                name: 'Eternity Engine',
+                description: 'An engine that runs forever, providing eternal clicking power.',
+                cost: 2.5e109,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000;
+                    gameState.autoClicks += 500000;
+                }
+            },
+            {
+                id: 'multiverse-conqueror',
+                name: 'Multiverse Conqueror',
+                description: 'Conquer infinite multiverses to gain supreme clicking authority.',
+                cost: 6e110,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000;
+                    gameState.autoClicks += 1000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 10;
+                }
+            },
+            {
+                id: 'quantum-entangler',
+                name: 'Quantum Entangler',
+                description: 'Entangle particles across realities for synchronized power boosts.',
+                cost: 1.5e112,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000;
+                    gameState.autoClicks += 5000000;
+                }
+            },
+            {
+                id: 'infinity-matrix',
+                name: 'Infinity Matrix',
+                description: 'A matrix of infinite possibilities that maximizes all stats.',
+                cost: 4e113,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000000;
+                    gameState.autoClicks += 10000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e70;
+                }
+            },
+            {
+                id: 'chronal-disruptor',
+                name: 'Chronal Disruptor',
+                description: 'Disrupt the flow of time to accelerate all processes exponentially.',
+                cost: 1e115,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000000;
+                    gameState.autoClicks += 50000000;
+                }
+            },
+            {
+                id: 'reality-fractal',
+                name: 'Reality Fractal',
+                description: 'Create fractal realities that multiply your clicking power infinitely.',
+                cost: 2.5e116,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000000;
+                    gameState.autoClicks += 100000000;
+                }
+            },
+            {
+                id: 'eternal-nexus-core',
+                name: 'Eternal Nexus Core',
+                description: 'The core of all existence, providing ultimate clicking supremacy.',
+                cost: 6e117,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000000;
+                    gameState.autoClicks += 500000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 25;
+                }
+            },
+            {
+                id: 'omnipotent-amplifier',
+                name: 'Omnipotent Amplifier',
+                description: 'Amplify all power to omnipotent levels across all dimensions.',
+                cost: 1.5e119,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000000;
+                    gameState.autoClicks += 1000000000;
+                }
+            },
+            {
+                id: 'transcendent-catalyst',
+                name: 'Transcendent Catalyst',
+                description: 'Catalyze transcendence to break through all limitations.',
+                cost: 4e120,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000000;
+                    gameState.autoClicks += 5000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e80;
+                }
+            },
+            {
+                id: 'ultimate-singularity',
+                name: 'Ultimate Singularity',
+                description: 'The ultimate point of infinite density and power.',
+                cost: 1e122,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000000000;
+                    gameState.autoClicks += 10000000000;
+                }
+            },
+            {
+                id: 'godhood-essence',
+                name: 'Godhood Essence',
+                description: 'Essence of true godhood that elevates you beyond mortal limits.',
+                cost: 2.5e123,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000000000;
+                    gameState.autoClicks += 50000000000;
+                }
+            },
+            {
+                id: 'cosmic-overlord',
+                name: 'Cosmic Overlord',
+                description: 'Rule over the cosmos with absolute clicking authority.',
+                cost: 6e124,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000000000;
+                    gameState.autoClicks += 100000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 50;
+                }
+            },
+            {
+                id: 'dimensional-supremacy',
+                name: 'Dimensional Supremacy',
+                description: 'Supreme control over all dimensions and their clicking potential.',
+                cost: 1.5e126,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000000000;
+                    gameState.autoClicks += 500000000000;
+                }
+            },
+            {
+                id: 'eternity-manipulator',
+                name: 'Eternity Manipulator',
+                description: 'Manipulate eternity itself to create infinite clicking loops.',
+                cost: 4e127,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000000000;
+                    gameState.autoClicks += 1000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e90;
+                }
+            },
+            {
+                id: 'reality-overwriter',
+                name: 'Reality Overwriter',
+                description: 'Overwrite reality with your clicking supremacy.',
+                cost: 1e129,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000000000;
+                    gameState.autoClicks += 5000000000000;
+                }
+            },
+            {
+                id: 'infinite-multiplexer',
+                name: 'Infinite Multiplexer',
+                description: 'Multiply your power infinitely across infinite realities.',
+                cost: 2.5e130,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000000000000;
+                    gameState.autoClicks += 10000000000000;
+                }
+            },
+            {
+                id: 'transcendental-engine',
+                name: 'Transcendental Engine',
+                description: 'An engine that transcends all limitations and boundaries.',
+                cost: 6e131,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000000000000;
+                    gameState.autoClicks += 50000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 100;
+                }
+            },
+            {
+                id: 'ultimate-transcender',
+                name: 'Ultimate Transcender',
+                description: 'Transcend beyond all concepts of power and limitation.',
+                cost: 1.5e133,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000000000000;
+                    gameState.autoClicks += 100000000000000;
+                }
+            },
+            {
+                id: 'cosmic-creator',
+                name: 'Cosmic Creator',
+                description: 'Create entire cosmoses with your clicking power.',
+                cost: 4e134,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000000000000;
+                    gameState.autoClicks += 500000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e100;
+                }
+            },
+            {
+                id: 'eternal-dominator',
+                name: 'Eternal Dominator',
+                description: 'Dominate eternity with unmatched clicking supremacy.',
+                cost: 1e136,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000000000000;
+                    gameState.autoClicks += 1000000000000000;
+                }
+            },
+            {
+                id: 'reality-master',
+                name: 'Reality Master',
+                description: 'Master all realities and their infinite clicking potential.',
+                cost: 2.5e137,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000000000000;
+                    gameState.autoClicks += 5000000000000000;
+                }
+            },
+            {
+                id: 'infinite-overlord',
+                name: 'Infinite Overlord',
+                description: 'Rule over infinity with absolute clicking dominion.',
+                cost: 6e138,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000000000000000;
+                    gameState.autoClicks += 10000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 200;
+                }
+            },
+            {
+                id: 'transcendent-supreme',
+                name: 'Transcendent Supreme',
+                description: 'Supreme transcendence beyond all conceivable limits.',
+                cost: 1.5e140,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000000000000000;
+                    gameState.autoClicks += 50000000000000000;
+                }
+            },
+            {
+                id: 'ultimate-creator',
+                name: 'Ultimate Creator',
+                description: 'Create ultimate realities with infinite clicking power.',
+                cost: 4e141,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000000000000000;
+                    gameState.autoClicks += 100000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e110;
+                }
+            },
+            {
+                id: 'cosmic-supremacy',
+                name: 'Cosmic Supremacy',
+                description: 'Supreme cosmic power that defies all limitations.',
+                cost: 1e143,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000000000000000;
+                    gameState.autoClicks += 500000000000000000;
+                }
+            },
+            {
+                id: 'eternal-creator',
+                name: 'Eternal Creator',
+                description: 'Create eternal realities with boundless clicking energy.',
+                cost: 2.5e144,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000000000000000;
+                    gameState.autoClicks += 1000000000000000000;
+                }
+            },
+            {
+                id: 'infinite-supreme',
+                name: 'Infinite Supreme',
+                description: 'Supreme infinite power that transcends all existence.',
+                cost: 6e145,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000000000000000;
+                    gameState.autoClicks += 5000000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 500;
+                }
+            },
+            {
+                id: 'transcendent-ultimate',
+                name: 'Transcendent Ultimate',
+                description: 'The ultimate transcendence beyond all possible concepts.',
+                cost: 1.5e147,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000000000000000000;
+                    gameState.autoClicks += 10000000000000000000;
+                }
+            },
+            {
+                id: 'reality-supreme',
+                name: 'Reality Supreme',
+                description: 'Supreme mastery over all realities and their power.',
+                cost: 4e148,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000000000000000000;
+                    gameState.autoClicks += 50000000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e120;
+                }
+            },
+            {
+                id: 'cosmic-ultimate',
+                name: 'Cosmic Ultimate',
+                description: 'Ultimate cosmic power that creates and destroys realities.',
+                cost: 1e150,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000000000000000000;
+                    gameState.autoClicks += 100000000000000000000;
+                }
+            },
+            {
+                id: 'eternal-supreme',
+                name: 'Eternal Supreme',
+                description: 'Supreme eternal power that governs all of existence.',
+                cost: 2.5e151,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000000000000000000;
+                    gameState.autoClicks += 500000000000000000000;
+                }
+            },
+            {
+                id: 'infinite-ultimate',
+                name: 'Infinite Ultimate',
+                description: 'The ultimate infinite power that knows no bounds.',
+                cost: 6e152,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000000000000000000;
+                    gameState.autoClicks += 1000000000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 1000;
+                }
+            },
+            {
+                id: 'transcendent-supremacy',
+                name: 'Transcendent Supremacy',
+                description: 'Supremacy that transcends all forms of transcendence.',
+                cost: 1.5e154,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000000000000000000;
+                    gameState.autoClicks += 5000000000000000000000;
+                }
+            },
+            {
+                id: 'ultimate-supremacy',
+                name: 'Ultimate Supremacy',
+                description: 'The ultimate supremacy over all existence and non-existence.',
+                cost: 4e155,
+                persistentEffect: () => {
+                    gameState.clickValue *= 100000000000000000000000;
+                    gameState.autoClicks += 10000000000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e130;
+                }
+            },
+            {
+                id: 'cosmic-transcendent',
+                name: 'Cosmic Transcendent',
+                description: 'Transcendent cosmic power that defies all logic and reason.',
+                cost: 1e157,
+                persistentEffect: () => {
+                    gameState.clickValue *= 500000000000000000000000;
+                    gameState.autoClicks += 50000000000000000000000;
+                }
+            },
+            {
+                id: 'eternal-transcendent',
+                name: 'Eternal Transcendent',
+                description: 'Transcendent eternal power that exists beyond time.',
+                cost: 2.5e158,
+                persistentEffect: () => {
+                    gameState.clickValue *= 1000000000000000000000000;
+                    gameState.autoClicks += 100000000000000000000000;
+                }
+            },
+            {
+                id: 'infinite-transcendent',
+                name: 'Infinite Transcendent',
+                description: 'Transcendent infinite power that encompasses everything.',
+                cost: 6e159,
+                persistentEffect: () => {
+                    gameState.clickValue *= 5000000000000000000000000;
+                    gameState.autoClicks += 500000000000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.rebirthCount += 2000;
+                }
+            },
+            {
+                id: 'supreme-transcendent',
+                name: 'Supreme Transcendent',
+                description: 'The supreme transcendent power that rules over all.',
+                cost: 1.5e161,
+                persistentEffect: () => {
+                    gameState.clickValue *= 10000000000000000000000000;
+                    gameState.autoClicks += 1000000000000000000000000;
+                }
+            },
+            {
+                id: 'ultimate-transcendent',
+                name: 'Ultimate Transcendent',
+                description: 'The ultimate transcendent power beyond comprehension.',
+                cost: 4e162,
+                persistentEffect: () => {
+                    gameState.clickValue *= 50000000000000000000000000;
+                    gameState.autoClicks += 5000000000000000000000000;
+                },
+                oneTimeEffect: () => {
+                    gameState.score += 1e140;
+                }
+            }
+        ];
+
+        function renderShop() {
+            const shopList = document.getElementById('shopList');
+            if (!shopList) return;
+
+            shopList.innerHTML = '';
+            specialShopItems.forEach(item => {
+                const purchased = !!gameState.specialItemsPurchased[item.id];
+                const canAfford = gameState.score >= item.cost;
+                const shopItem = document.createElement('div');
+                shopItem.className = `shop-item ${purchased ? 'purchased' : ''} ${!canAfford && !purchased ? 'disabled' : ''}`;
+                shopItem.innerHTML = `
+                    <div>
+                        <h3>${item.name}</h3>
+                        <p>${item.description}</p>
+                        <p class="shop-price">Cost: ${formatNumber(item.cost)}</p>
+                    </div>
+                    <button class="shop-button" ${purchased || !canAfford ? 'disabled' : ''}>
+                        ${purchased ? 'Purchased' : 'Buy'}
+                    </button>
+                `;
+
+                shopItem.addEventListener('click', () => purchaseSpecialItem(item));
+                shopList.appendChild(shopItem);
+            });
+
+            if (shopList.children.length === 0) {
+                shopList.innerHTML = '<div class="no-shop-items">No special items available.</div>';
+            }
+        }
+
+        function purchaseSpecialItem(item) {
+            if (gameState.specialItemsPurchased[item.id]) {
+                alert('You already bought this item.');
+                return;
+            }
+            if (gameState.score < item.cost) {
+                alert('You do not have enough clicks to buy this item.');
+                return;
+            }
+
+            gameState.score -= item.cost;
+            gameState.specialItemsPurchased[item.id] = true;
+            if (item.persistentEffect) item.persistentEffect();
+            if (item.oneTimeEffect) item.oneTimeEffect();
+            saveGame();
+            updateDisplay();
+            renderShop();
+            renderLeaderboard();
+
+            alert(`${item.name} purchased!`);
+        }
+
+        function applyPurchasedSpecialShopEffects() {
+            Object.keys(gameState.specialItemsPurchased).forEach(itemId => {
+                const item = specialShopItems.find(shopItem => shopItem.id === itemId);
+                if (item && item.persistentEffect) {
+                    item.persistentEffect();
+                }
+            });
+        }
+
+        // Initialize Game
+        function initGame() {
+            // Initialize owner account first
+            initializeOwnerAccount();
+
+            // Load full game state first
+            loadGame();
+
+            // Check if user is logged in
+            const accountName = getCurrentAccountName();
+            if (!accountName) {
+                // No account logged in, show login modal
+                showLoginModal();
+            } else {
+                // User is logged in, hide the modal and load account data
+                closeLoginModal();
+                // Apply account-specific data to the loaded game state
+                const accounts = getAllAccounts();
+                const account = accounts[accountName];
+                if (account) {
+                    gameState.userName = account.userName;
+                    gameState.userTag = account.userTag || '';
+                    gameState.tagColor = account.tagColor || '#667eea';
+                    // Update user data in users object
+                    if (gameState.currentUserId) {
+                        gameState.users[gameState.currentUserId] = {
+                            name: gameState.userName,
+                            tag: gameState.userTag,
+                            tagColor: gameState.tagColor,
+                            isOriginalOwner: gameState.userName === 'notz'
+                        };
+                    }
+                }
+            }
+            
+            // Load or create user identity
+            gameState.currentUserId = getOrCreateUserIdentity();
+            loadUserData(gameState.currentUserId);
+            
+            // Owner status is based on username "notz"
+            gameState.isOriginalOwner = gameState.userName === 'notz';
+            
+            document.getElementById('displayedName').textContent = gameState.userName;
+            updateTagDisplay();
+            updateUserLeaderboardEntry();
+            renderUpgrades();
+            renderShop();
+            updateDisplay();
+            setupAutoClicker();
+            renderComments();
+            setupCommentListeners();
+            renderLeaderboard();
+            checkRebirthAvailability();
+            
+            renderOnlineUsers();
+            updateOnlinePresence();
+            setInterval(updateOnlinePresence, 5000);
+            setInterval(() => {
+                // Periodically check for new comments from other users
+                const saved = localStorage.getItem('clickerGameState');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        if (parsed.comments && parsed.comments.length !== gameState.comments.length) {
+                            gameState.comments = parsed.comments;
+                            gameState.users = parsed.users || {};
+                            renderComments();
+                            renderActiveUsers();
+                        }
+                    } catch (e) {
+                        // Ignore
+                    }
+                }
+            }, 2000); // Check every 2 seconds
+            window.addEventListener('beforeunload', clearOnlinePresence);
+            
+            // Show/hide owner UI elements
+            updateOwnerUI();
+            
+            // Save user data after initialization
+            saveUserData(gameState.currentUserId);
+            saveGame();
+        }
+
+        // Update Owner UI Elements
+        function updateOwnerUI() {
+            const ownerBadge = document.querySelector('.owner-badge');
+            const moderationBtn = document.querySelector('.comments-title .moderation-toggle');
+            
+            const ownerPrivileges = document.getElementById('ownerPrivileges');
+            if (gameState.isOriginalOwner) {
+                ownerBadge.style.display = 'inline';
+                if (moderationBtn) moderationBtn.style.display = 'inline-block';
+                if (ownerPrivileges) ownerPrivileges.style.display = 'block';
+            } else {
+                ownerBadge.style.display = 'none';
+                if (moderationBtn) moderationBtn.style.display = 'none';
+                if (ownerPrivileges) ownerPrivileges.style.display = 'none';
+                // Hide moderation panel if not owner
+                document.getElementById('moderationSection').style.display = 'none';
+            }
+        }
+
+        // Save Game
+        function saveGame() {
+            const saveState = {
+                ...gameState,
+                score: Number.isFinite(gameState.score) ? gameState.score : 'Infinity'
+            };
+            localStorage.setItem('clickerGameState', JSON.stringify(saveState));
+        }
+
+        // Load Game
+        function loadGame() {
+            const saved = localStorage.getItem('clickerGameState');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    gameState = {
+                        score: parsed.score === 'Infinity' ? Infinity : (parsed.score ?? 0),
+                        totalClicks: parsed.totalClicks ?? 0,
+                        totalSpent: parsed.totalSpent ?? 0,
+                        autoClicks: parsed.autoClicks ?? 0,
+                        clickValue: parsed.clickValue ?? 1,
+                        upgrades: Array.isArray(parsed.upgrades) ? parsed.upgrades : [],
+                        comments: Array.isArray(parsed.comments) ? parsed.comments : [],
+                        userName: parsed.userName === 'notz' ? DEFAULT_USERNAME : (parsed.userName || gameState.userName), // Keep current name if no saved name
+                        userTag: parsed.userTag || '',
+                        tagColor: parsed.tagColor || '#667eea',
+                        isOriginalOwner: false, // Will be set below
+                        ownerUserId: parsed.ownerUserId || null,
+                        ownerBoostActivated: parsed.ownerBoostActivated ?? gameState.ownerBoostActivated,
+                        users: parsed.users || {},
+                        currentUserId: parsed.currentUserId || null,
+                        rebirthCount: parsed.rebirthCount ?? 0,
+                        totalClicksAllTime: parsed.totalClicksAllTime ?? 0,
+                        specialItemsPurchased: parsed.specialItemsPurchased || {}
+                    };
+                    // Set owner status based on username
+                    gameState.isOriginalOwner = gameState.userName === 'notz';
+                } catch (error) {
+                    console.warn('Failed to load saved game, using defaults:', error);
+                    // Keep the current gameState (which has the default name)
+                }
+            }
+            // Always save the current state to ensure persistence
+            saveGame();
+        }
+
+        // Handle Click
+        document.getElementById('clickButton').addEventListener('click', function(e) {
+            gameState.score += gameState.clickValue;
+            gameState.totalClicks += 1;
+            updateUserLeaderboardEntry();
+            renderLeaderboard();
+            checkInfinity();
+            updateDisplay();
+            saveGame();
+            
+            // Animation effect
+            createPopup(e, gameState.clickValue);
+            
+            // Button animation
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 100);
+        });
+
+        // Create Floating Popup
+        function createPopup(event, value) {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.textContent = '+' + value;
+            popup.style.left = event.clientX + 'px';
+            popup.style.top = event.clientY + 'px';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
+        }
+
+        // Render Upgrades
+        function renderUpgrades() {
+            const upgradesList = document.getElementById('upgradesList');
+            upgradesList.innerHTML = '';
+
+            upgradeDefinitions.forEach(def => {
+                const upgrade = gameState.upgrades.find(u => u.id === def.id) || {
+                    id: def.id,
+                    count: 0
+                };
+
+                const cost = Math.ceil(def.baseCost * Math.pow(1.15, upgrade.count));
+                const canAfford = gameState.score >= cost;
+                const isPurchased = upgrade.count > 0;
+
+                const upgradeEl = document.createElement('div');
+                upgradeEl.className = `upgrade-item ${isPurchased ? 'purchased' : ''} ${!canAfford ? 'disabled' : ''}`;
+                upgradeEl.innerHTML = `
+                    <div class="upgrade-info">
+                        <h3>${def.name}</h3>
+                        <p>${def.description}</p>
+                        <p style="color: #667eea; font-weight: bold;">Owned: ${upgrade.count}</p>
+                    </div>
+                    <div class="upgrade-cost">${formatNumber(cost)}</div>
+                `;
+
+                upgradeEl.addEventListener('click', () => purchaseUpgrade(def));
+
+                upgradesList.appendChild(upgradeEl);
+            });
+        }
+
+        // Purchase Upgrade
+        function purchaseUpgrade(def) {
+            const upgrade = gameState.upgrades.find(u => u.id === def.id);
+            const cost = Math.ceil(def.baseCost * Math.pow(1.15, upgrade ? upgrade.count : 0));
+
+            if (gameState.score >= cost) {
+                gameState.score -= cost;
+                gameState.totalSpent += cost;
+
+                if (upgrade) {
+                    upgrade.count++;
+                } else {
+                    gameState.upgrades.push({ id: def.id, count: 1 });
+                }
+
+                def.effect();
+                updateDisplay();
+                renderUpgrades();
+                saveGame();
+            }
+        }
+
+        // Auto Clicker
+        function setupAutoClicker() {
+            setInterval(() => {
+                if (gameState.autoClicks > 0) {
+                    gameState.score += gameState.autoClicks;
+                    checkInfinity();
+                    updateDisplay();
+                    saveGame();
+                }
+            }, 1000);
+        }
+
+        // Update Display
+        function updateDisplay() {
+            checkInfinity();
+            document.getElementById('score').textContent = formatNumber(gameState.score);
+            document.getElementById('totalClicks').textContent = formatNumber(gameState.totalClicks);
+            document.getElementById('cps').textContent = gameState.autoClicks;
+            document.getElementById('cpsDisplay').textContent = `Clicks per second: ${gameState.autoClicks}`;
+            document.getElementById('activeUpgrades').textContent = gameState.upgrades.length;
+            document.getElementById('totalSpent').textContent = formatNumber(gameState.totalSpent);
+            
+            // Check rebirth availability
+            checkRebirthAvailability();
+        }
+
+        // Format Large Numbers
+        function formatNumber(num) {
+            if (!Number.isFinite(num)) return num.toString();
+            if (num >= 1e21) return num.toExponential(2);
+            if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+            return num.toLocaleString();
+        }
+
+        function checkInfinity() {
+            // Keep score growth going without converting to Infinity.
+        }
+
+        // Reset Game
+        function resetGame() {
+            if (confirm('Are you sure you want to reset your progress? (Leaderboard will NOT be cleared)')) {
+                gameState = {
+                    score: 0,
+                    totalClicks: 0,
+                    totalSpent: 0,
+                    autoClicks: 0,
+                    clickValue: 1,
+                    upgrades: [],
+                    comments: gameState.comments,
+                    userName: gameState.userName,
+                    userTag: gameState.userTag,
+                    tagColor: gameState.tagColor,
+                    isOriginalOwner: gameState.isOriginalOwner,
+                    ownerBoostActivated: gameState.ownerBoostActivated,
+                    users: gameState.users, // Preserve user data
+                    currentUserId: gameState.currentUserId,
+                    rebirthCount: gameState.rebirthCount, // Keep rebirth count
+                    totalClicksAllTime: gameState.totalClicksAllTime // Keep all-time clicks
+                };
+                saveGame();
+                updateDisplay();
+                renderUpgrades();
+                renderComments();
+                checkRebirthAvailability();
+            }
+        }
+
+        // Clear Leaderboard (Owner Only)
+        function clearLeaderboard() {
+            if (!gameState.isOriginalOwner) return;
+            if (confirm('Are you sure you want to clear the entire leaderboard and reset everyone\'s progress? This action cannot be undone!')) {
+                const preservedOwnerId = gameState.ownerUserId;
+                const preservedCurrentUserId = gameState.currentUserId;
+                const preservedUserName = gameState.userName;
+                const preservedUserTag = gameState.userTag;
+                const preservedTagColor = gameState.tagColor;
+
+                // Clear all leaderboard and reset shared progress state, but keep comments intact
+                saveLeaderboard([]);
+                gameState = {
+                    score: 0,
+                    totalClicks: 0,
+                    totalSpent: 0,
+                    autoClicks: 0,
+                    clickValue: 1,
+                    upgrades: [],
+                    comments: gameState.comments,
+                    userName: preservedUserName,
+                    userTag: preservedUserTag,
+                    tagColor: preservedTagColor,
+                    isOriginalOwner: true,
+                    ownerUserId: preservedOwnerId,
+                    ownerBoostActivated: false,
+                    users: {},
+                    currentUserId: preservedCurrentUserId,
+                    rebirthCount: 0,
+                    totalClicksAllTime: 0,
+                    specialItemsPurchased: {}
+                };
+
+                saveGame();
+                renderLeaderboard();
+                renderUpgrades();
+                renderShop();
+                updateDisplay();
+                renderComments();
+                checkRebirthAvailability();
+                updateOwnerUI();
+                alert('Leaderboard and all progress have been reset by the owner.');
+            }
+        }
+
+        // Setup Comment Listeners
+        function setupCommentListeners() {
+            const submitBtn = document.getElementById('submitCommentBtn');
+            const commentInput = document.getElementById('commentInput');
+
+            submitBtn.addEventListener('click', addComment);
+            commentInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addComment();
+            });
+
+            // Color picker listeners
+            document.getElementById('tagTextInput').addEventListener('input', updateColorPreview);
+            document.getElementById('tagColorInput').addEventListener('input', updateColorPreview);
+            
+            // Close modal when clicking outside
+            document.getElementById('colorPickerModal').addEventListener('click', (e) => {
+                if (e.target.id === 'colorPickerModal') {
+                    closeColorPicker();
+                }
+            });
+        }
+
+        // Add Comment
+        function addComment() {
+            const commentInput = document.getElementById('commentInput');
+            const text = commentInput.value.trim();
+
+            if (text === '') {
+                alert('Please enter a comment!');
+                return;
+            }
+            if (gameState.comments.length >= COMMENT_LIMIT) {
+                alert('Maximum 1,000,000 comments reached!');
+                return;
+            }
+
+            gameState.comments.push({
+                text: text,
+                userId: gameState.currentUserId,
+                timestamp: new Date().toLocaleTimeString(),
+                id: Date.now(), // Add unique ID for moderation
+                pinned: false // Track if comment is pinned by owner
+            });
+
+            commentInput.value = '';
+            saveGame();
+            renderComments();
+            renderActiveUsers();
+            commentInput.focus();
+        }
+
+        // Edit Name
+        function editName() {
+            const newName = prompt('Enter your name:', gameState.userName);
+            if (newName && newName.trim() !== '') {
+                const oldName = gameState.userName;
+                gameState.userName = newName.trim();
+                gameState.isOriginalOwner = gameState.userName === 'notz';
+                document.getElementById('displayedName').textContent = gameState.userName;
+                
+                updateOwnerUI();
+                
+                // Save user data with new name
+                saveUserData(gameState.currentUserId);
+                
+                // If logged in, also update the account data
+                const accountName = getCurrentAccountName();
+                if (accountName) {
+                    const accounts = getAllAccounts();
+                    if (accounts[accountName]) {
+                        accounts[accountName].userName = gameState.userName;
+                        saveAccounts(accounts);
+                    }
+                }
+                
+                saveGame(); // Ensure name is saved immediately
+                updateOnlinePresence();
+                renderComments(); // Re-render to update owner badges
+            }
+        }
+
+        // Edit Tag
+        function editTag() {
+            document.getElementById('tagTextInput').value = gameState.userTag;
+            document.getElementById('tagColorInput').value = gameState.tagColor;
+            updateColorPreview();
+            document.getElementById('colorPickerModal').style.display = 'flex';
+        }
+
+        // Update Color Preview
+        function updateColorPreview() {
+            const color = document.getElementById('tagColorInput').value;
+            const text = document.getElementById('tagTextInput').value.trim();
+            const preview = document.getElementById('colorPreview');
+            preview.textContent = text || 'Your Tag';
+            preview.style.color = color;
+            preview.style.backgroundColor = color + '20';
+        }
+
+        // Save Tag Changes
+        function saveTagChanges() {
+            const newTag = document.getElementById('tagTextInput').value.trim();
+            const newColor = document.getElementById('tagColorInput').value;
+            
+            gameState.userTag = newTag;
+            gameState.tagColor = newColor;
+            
+            updateTagDisplay();
+            
+            // Save user data with new tag
+            saveUserData(gameState.currentUserId);
+            
+            // If logged in, also update the account data
+            const accountName = getCurrentAccountName();
+            if (accountName) {
+                const accounts = getAllAccounts();
+                if (accounts[accountName]) {
+                    accounts[accountName].userTag = newTag;
+                    accounts[accountName].tagColor = newColor;
+                    saveAccounts(accounts);
+                }
+            }
+            
+            saveGame();
+            closeColorPicker();
+        }
+
+        function activateOwnerBoost() {
+            if (!gameState.isOriginalOwner) return;
+            if (gameState.ownerBoostActivated) {
+                alert('Owner boost is already active!');
+                return;
+            }
+            gameState.clickValue += 5;
+            gameState.autoClicks += 2;
+            gameState.ownerBoostActivated = true;
+            saveGame();
+            renderUpgrades();
+            updateDisplay();
+            alert('Owner boost activated! Your clicks are stronger now.');
+        }
+
+        function giveOwnerGift() {
+            if (!gameState.isOriginalOwner) return;
+            gameState.score += 1000;
+            gameState.totalSpent = Math.max(0, gameState.totalSpent - 0);
+            saveGame();
+            updateDisplay();
+            alert('Owner gift applied: +1000 score!');
+        }
+
+        function clearAllComments() {
+            if (!gameState.isOriginalOwner) return;
+            if (confirm('Clear all comments from the board?')) {
+                gameState.comments = [];
+                saveGame();
+                renderComments();
+                renderActiveUsers();
+                alert('All comments have been removed by the owner.');
+            }
+        }
+
+        // Close Color Picker
+        function closeColorPicker() {
+            document.getElementById('colorPickerModal').style.display = 'none';
+        }
+
+        // Update Tag Display
+        function updateTagDisplay() {
+            const tagElement = document.getElementById('displayedTag');
+            if (gameState.userTag) {
+                tagElement.textContent = gameState.userTag;
+                tagElement.style.color = gameState.tagColor;
+                tagElement.style.backgroundColor = gameState.tagColor + '20'; // Add transparency
+                tagElement.style.display = 'inline-block';
+            } else {
+                tagElement.style.display = 'none';
+            }
+        }
+
+        // Render Comments
+        function renderComments() {
+            const commentsList = document.getElementById('commentsList');
+            const commentCount = document.getElementById('commentCount');
+
+            if (!commentsList || !commentCount) return;
+
+            const comments = Array.isArray(gameState.comments) ? gameState.comments : [];
+            commentCount.textContent = `${comments.length}/${COMMENT_LIMIT}`;
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first!</div>';
+                return;
+            }
+
+            // Sort comments: pinned first, then by timestamp (newest first)
+            const sortedComments = comments.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return 0;
+            });
+
+            const commentsHTML = sortedComments.map(comment => {
+                let displayName, displayTag, displayTagColor;
+                if (comment.userId) {
+                    const userData = gameState.users[comment.userId] || {};
+                    displayName = userData.name || 'Default';
+                    displayTag = userData.tag || '';
+                    displayTagColor = userData.tagColor || '#667eea';
+                } else {
+                    // Backward compatibility for old comments
+                    displayName = comment.author || 'Default';
+                    displayTag = comment.tag || '';
+                    displayTagColor = comment.tagColor || '#667eea';
+                }
+                return `
+                <div class="comment-item" data-comment-id="${comment.id || 0}">
+                    <div class="comment-author">👤 ${sanitizeHTML(displayName)}${(displayName === 'notz') ? ' <span class="owner-badge">👑</span>' : ''}${displayTag ? ` <span class="comment-tag" style="color: ${displayTagColor}; font-size: 0.8em;">${sanitizeHTML(displayTag)}</span>` : ''}</div>
+                    <div class="comment-text">${sanitizeHTML(comment.text)}</div>
+                    <div class="comment-time">${sanitizeHTML(comment.timestamp || '')}</div>
+                    ${gameState.isOriginalOwner && ((comment.userId && comment.userId !== gameState.currentUserId) || (!comment.userId && comment.author !== gameState.userName)) ? `
+                    <div class="moderation-buttons">
+                        <button class="mod-btn kick-btn" onclick="kickUser('${comment.userId || comment.author}', ${comment.id})" title="Remove this comment">�️</button>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+
+            commentsList.innerHTML = commentsHTML;
+            commentsList.scrollTop = commentsList.scrollHeight;
+        }
+
+        // Sanitize HTML to prevent XSS
+        function sanitizeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Remove a single comment
+        function kickUser(identifier, commentId) {
+            const comment = gameState.comments.find(c => c.id === commentId);
+            if (!comment) return;
+            let displayName;
+            if (comment.userId) {
+                const userData = gameState.users[comment.userId] || {};
+                displayName = userData.name || 'Default';
+            } else {
+                displayName = comment.author || 'Default';
+            }
+            if (confirm(`Remove comment from ${displayName}?`)) {
+                gameState.comments = gameState.comments.filter(c => c.id !== commentId);
+                saveGame();
+                renderComments();
+                renderActiveUsers();
+            }
+        }
+
+        // Toggle Moderation Panel
+        function toggleModerationPanel() {
+            const panel = document.getElementById('moderationSection');
+            const panelToggleBtn = panel.querySelector('.moderation-toggle');
+            const commentsToggleBtn = document.querySelector('.comments-title .moderation-toggle');
+
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'flex';
+                if (panelToggleBtn) panelToggleBtn.textContent = 'Hide Panel';
+                if (commentsToggleBtn) commentsToggleBtn.textContent = '🛡️ Hide Moderation';
+                renderActiveUsers();
+            } else {
+                panel.style.display = 'none';
+                if (panelToggleBtn) panelToggleBtn.textContent = 'Show Panel';
+                if (commentsToggleBtn) commentsToggleBtn.textContent = '🛡️ Moderation';
+            }
+        }
+
+        // Get all unique active users (who have posted comments)
+        function getActiveUsers() {
+            const comments = Array.isArray(gameState.comments) ? gameState.comments : [];
+            const allUserIds = [...new Set(comments.map(comment => comment.userId).filter(id => id))];
+            // Filter out the current user (owner can't kick themselves)
+            return allUserIds.filter(userId => userId !== gameState.currentUserId);
+        }
+
+        // Render Active Users List
+        function renderActiveUsers() {
+            const activeUsersList = document.getElementById('activeUsersList');
+            
+            if (!activeUsersList) return;
+
+            const activeUsers = getActiveUsers();
+
+            if (activeUsers.length === 0) {
+                activeUsersList.innerHTML = '<div class="no-active-users">No active users to moderate.</div>';
+                return;
+            }
+
+            const activeUsersHTML = activeUsers.map(userId => {
+                const userData = gameState.users[userId] || {};
+                const displayName = userData.name || 'Default';
+                return `
+                <div class="active-user-item">
+                    <span class="active-user-name">${sanitizeHTML(displayName)}</span>
+                    <div class="user-actions">
+                        <button class="user-kick-btn" onclick="kickUserFromPanel('${userId}')" title="Remove all comments from this user">�️ Remove</button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            activeUsersList.innerHTML = activeUsersHTML;
+        }
+
+        function getOnlineUsersFromStorage() {
+            const saved = localStorage.getItem(ONLINE_USERS_STORAGE_KEY);
+            if (!saved) return {};
+            try {
+                return JSON.parse(saved) || {};
+            } catch (error) {
+                console.warn('Failed to parse online users:', error);
+                return {};
+            }
+        }
+
+        function saveOnlineUsersToStorage(users) {
+            localStorage.setItem(ONLINE_USERS_STORAGE_KEY, JSON.stringify(users));
+        }
+
+        function updateOnlinePresence() {
+            if (!gameState.currentUserId) return;
+
+            const now = Date.now();
+            const users = getOnlineUsersFromStorage();
+            users[gameState.currentUserId] = {
+                name: gameState.userName,
+                lastActive: now
+            };
+
+            const cutoff = now - ONLINE_TIMEOUT_MS;
+            Object.keys(users).forEach(userId => {
+                if (users[userId].lastActive < cutoff) {
+                    delete users[userId];
+                }
+            });
+
+            saveOnlineUsersToStorage(users);
+            renderOnlineUsers();
+        }
+
+        function clearOnlinePresence() {
+            if (!gameState.currentUserId) return;
+
+            const users = getOnlineUsersFromStorage();
+            if (users[gameState.currentUserId]) {
+                delete users[gameState.currentUserId];
+                saveOnlineUsersToStorage(users);
+            }
+        }
+
+        function renderOnlineUsers() {
+            const onlineUsersList = document.getElementById('onlineUsersList');
+            const onlineUsersCount = document.getElementById('onlineUsersCount');
+            if (!onlineUsersList || !onlineUsersCount) return;
+
+            const now = Date.now();
+            const users = Object.values(getOnlineUsersFromStorage())
+                .filter(user => user.lastActive >= now - ONLINE_TIMEOUT_MS);
+
+            onlineUsersCount.textContent = users.length;
+
+            if (users.length === 0) {
+                onlineUsersList.innerHTML = '<div class="no-active-users">No one is currently online.</div>';
+                return;
+            }
+
+            const anonymousUsers = users.filter(user => !user.name || user.name === DEFAULT_USERNAME).length;
+            const namedUsers = users.filter(user => user.name && user.name !== DEFAULT_USERNAME);
+
+            let onlineUsersHTML = '';
+            if (anonymousUsers > 0) {
+                onlineUsersHTML += `
+                    <div class="active-user-item">
+                        <span class="active-user-name">Default User${anonymousUsers > 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            }
+            onlineUsersHTML += namedUsers.map(user => `
+                <div class="active-user-item">
+                    <span class="active-user-name">${sanitizeHTML(user.name)}</span>
+                </div>
+            `).join('');
+
+            onlineUsersList.innerHTML = onlineUsersHTML;
+        }
+
+        // Remove all comments from a user in the panel
+        function kickUserFromPanel(userId) {
+            const userData = gameState.users[userId] || {};
+            const displayName = userData.name || 'Default';
+            if (confirm(`Remove ALL comments from ${displayName}?`)) {
+                gameState.comments = gameState.comments.filter(comment => comment.userId !== userId);
+                saveGame();
+                renderComments();
+                renderActiveUsers();
+                alert(`All comments from ${displayName} have been removed!`);
+            }
+        }
+
+        // Quick remove comments for a user (prompt for username)
+        function quickKickUser() {
+            const username = prompt('Enter the username to remove comments for:');
+            if (username && username.trim() !== '') {
+                const cleanUsername = username.trim();
+                const userData = Object.entries(gameState.users).find(([userId, data]) => data.name === cleanUsername);
+                if (!userData) {
+                    alert(`No user found with the name "${cleanUsername}".`);
+                    return;
+                }
+                const targetUserId = userData[0];
+                if (targetUserId === gameState.currentUserId) {
+                    alert('You cannot kick yourself!');
+                    return;
+                }
+                const userDataObj = userData[1];
+                const displayName = userDataObj.name || 'Default';
+                if (confirm(`Remove ALL comments from "${displayName}"?`)) {
+                    const commentsBefore = gameState.comments.length;
+                    gameState.comments = gameState.comments.filter(comment => comment.userId !== targetUserId);
+                    const commentsRemoved = commentsBefore - gameState.comments.length;
+                    
+                    saveGame();
+                    renderComments();
+                    renderActiveUsers();
+                    
+                    if (commentsRemoved > 0) {
+                        alert(`Removed ${commentsRemoved} comment(s) from "${displayName}"!`);
+                    } else {
+                        alert(`No comments found from "${displayName}".`);
+                    }
+                }
+            }
+        }
+
+        // Initialize the game when the page loads
+        initGame();
+    </script>
+</body>
+</html>
